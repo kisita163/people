@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "165320203312",
+    "firebase_url": "https://people-e8289.firebaseio.com",
+    "project_id": "people-e8289",
+    "storage_bucket": "people-e8289.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:165320203312:android:f3464e1b7a85ec72",
+        "android_client_info": {
+          "package_name": "com.kisita.people"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "165320203312-3sgs7191riplp82calt63msjvssfofic.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyALPDITUxdQwO5WVZFeRmN1A3zuiCQEGmM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
