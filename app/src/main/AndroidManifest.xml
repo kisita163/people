@@ -42,11 +42,18 @@
         <receiver
             android:name=".location.PeopleReceiver"
             android:enabled="true"
-            android:exported="false">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <category android:name="android.intent.category.HOME" />
             </intent-filter>
         </receiver>
+
+        <service
+            android:name=".location.PeoplePositionService"
+            android:enabled="true"
+            android:exported="true" />
+
     </application>
 
 </manifest>

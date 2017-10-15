@@ -10,12 +10,14 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.support.annotation.Nullable;
 import android.support.v4.os.ResultReceiver;
 import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,10 +28,6 @@ public class PositionService extends Service {
     private AddressResultReceiver mResultReceiver;
 
     private LocationManager locationMgr = null;
-
-    public PositionService() {
-    }
-
     private LocationListener onLocationChange = new LocationListener()
     {
         @Override
@@ -55,9 +53,7 @@ public class PositionService extends Service {
         }
     };
 
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
+    public PositionService() {
     }
 
     @Override
@@ -98,6 +94,12 @@ public class PositionService extends Service {
         locationMgr.removeUpdates(onLocationChange);
     }
 
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
     protected void startIntentService(Location location) {
         Intent intent = new Intent(this, FetchAddressIntentService.class);
         intent.putExtra(FetchAddressIntentService.Constants.RECEIVER, mResultReceiver);
@@ -115,9 +117,13 @@ public class PositionService extends Service {
 
         Map<String, Object> childUpdates = new HashMap<>();
 
-        childUpdates.put("/positions/" + getUid() + "/Thoroughfare",address.getThoroughfare());
-        childUpdates.put("/positions/" + getUid() + "/PostalCode"  ,address.getPostalCode());
-        childUpdates.put("/positions/" + getUid() + "/AdminArea"   ,address.getAdminArea());
+        // Pseudo and sex
+        childUpdates.put("/positions/" + getUid() + "/pseudo", "kisita162"); // TODO get this data from shared preference
+        childUpdates.put("/positions/" + getUid() + "/sex", "0");         // TODO get this data from shared preference
+
+        childUpdates.put("/positions/" + getUid() + "/thoroughfare", address.getThoroughfare());
+        childUpdates.put("/positions/" + getUid() + "/postalCode", address.getPostalCode());
+        childUpdates.put("/positions/" + getUid() + "/adminArea", address.getAdminArea());
 
         childUpdates.put("/positions/" + getUid() + "/country"     ,address.getCountryCode());
         childUpdates.put("/positions/" + getUid() + "/latitude"    , address.getLatitude());

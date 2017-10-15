@@ -1,10 +1,13 @@
 package com.kisita.people;
 
 import android.app.ActivityManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -18,17 +21,17 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.kisita.people.location.PeoplePositionService;
 import com.kisita.people.location.PositionService;
 
-public class MainActivity extends AppCompatActivity {
-
-    private static String TAG = "### Main activity";
-
-    private TextView mTextMessage;
+public class MainActivity extends AppCompatActivity implements ServiceConnection {
 
     private static final int REQUEST_COARSE_LOCATION = 100;
-
+    private static String TAG = "### Main activity";
+    PeoplePositionService mService;
+    private TextView mTextMessage;
     private FirebaseAuth mAuth;
+    private boolean mBound;
 
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -38,13 +41,13 @@ public class MainActivity extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.navigation_home:
-                    mTextMessage.setText(R.string.title_home);
+                    mTextMessage.setText(R.string.title_people);
                     return true;
                 case R.id.navigation_dashboard:
-                    mTextMessage.setText(R.string.title_dashboard);
+                    mTextMessage.setText(R.string.title_chat);
                     return true;
                 case R.id.navigation_notifications:
-                    mTextMessage.setText(R.string.title_notifications);
+                    mTextMessage.setText(R.string.title_settings);
                     return true;
             }
             return false;
@@ -91,9 +94,20 @@ public class MainActivity extends AppCompatActivity {
                     new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION},
                     REQUEST_COARSE_LOCATION);
         }else{
+            // Start position service if it is not running
             if(!isMyServiceRunning(PositionService.class)){
-                Log.i(TAG,"FixHandler service is not running. Start it now");
-                startService(new Intent(MainActivity.this,PositionService.class));
+                Log.i(TAG, "Position service is not running. Start it now");
+                Intent i = new Intent(MainActivity.this, PositionService.class);
+                startService(i);
+                //bindService(i, this, Context.BIND_AUTO_CREATE);
+            }
+
+            // Start people position service if it is not running
+            if (!isMyServiceRunning(PeoplePositionService.class)) {
+                Log.i(TAG, "People position service is not running. Start it now");
+                Intent i = new Intent(MainActivity.this, PeoplePositionService.class);
+                startService(i);
+                bindService(i, this, Context.BIND_AUTO_CREATE);
             }
         }
     }
@@ -106,9 +120,21 @@ public class MainActivity extends AppCompatActivity {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    // Start position service if it is not running
                     if(!isMyServiceRunning(PositionService.class)){
-                        Log.i(TAG,"FixHandler service is not running. Start it now");
-                        startService(new Intent(MainActivity.this,PositionService.class));
+                        Log.i(TAG, "Position service is not running. Start it now");
+                        Intent i = new Intent(MainActivity.this, PositionService.class);
+                        startService(i);
+                        //bindService(i, this, Context.BIND_AUTO_CREATE);
+                    }
+
+                    // Start people position service if it is not running
+                    if (!isMyServiceRunning(PeoplePositionService.class)) {
+                        Log.i(TAG, "People position service is not running. Start it now");
+                        Intent i = new Intent(MainActivity.this, PeoplePositionService.class);
+                        startService(i);
+                        bindService(i, this, Context.BIND_AUTO_CREATE);
                     }
 
                 } else {
@@ -132,4 +158,20 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
+    @Override
+    public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+        Log.i(TAG, "People service connected");
+        PeoplePositionService.LocalBinder binder = (PeoplePositionService.LocalBinder) iBinder;
+        mService = binder.getService();
+
+        Log.i(TAG, "Hashmap size is : " + mService.getHashMap().size());
+
+        mBound = true;
+    }
+
+    @Override
+    public void onServiceDisconnected(ComponentName componentName) {
+        Log.i(TAG, "People service disconnected");
+        mBound = false;
+    }
 }
