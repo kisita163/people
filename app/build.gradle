@@ -29,7 +29,7 @@ task findbugs(type: FindBugs) {
     ignoreFailures = true
     effort = "max"
     reportLevel = "low"
-    classes = files("$project.buildDir/intermediates/classes")
+    classes = files("$project.buildDir/intermediates/classes/release/com/kisita")
 
     // Use this only if you want exclude some errors
     //excludeFilter = file("$rootProject.rootDir/config/findbugs/exclude.xml")
